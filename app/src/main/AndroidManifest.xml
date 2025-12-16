@@ -60,7 +60,10 @@
             android:name=".OrderRecapActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".OrderDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".TopicActivity"
             android:exported="false"

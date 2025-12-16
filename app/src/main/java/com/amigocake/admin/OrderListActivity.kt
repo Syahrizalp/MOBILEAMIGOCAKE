@@ -32,7 +32,7 @@ class OrderListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_order_list)
 
         initViews()
-//        setupRecyclerView()
+        setupRecyclerView()
         setupClickListeners()
         setupNavigation()
         loadOrders()
@@ -45,19 +45,19 @@ class OrderListActivity : AppCompatActivity() {
         filterSortButton = findViewById(R.id.filter_sort_button)
     }
 
-//    private fun setupRecyclerView() {
-//        orderAdapter = OrderAdapter(orderList) { order ->
-//            // Handle item click
-//            val intent = Intent(this, OrderDetailActivity::class.java)
-//            intent.putExtra("ORDER_ID", order.id)
-//            startActivity(intent)
-//        }
-//
-//        recyclerView.apply {
-//            layoutManager = LinearLayoutManager(this@OrderListActivity)
-//            adapter = orderAdapter
-//        }
-//    }
+    private fun setupRecyclerView() {
+        orderAdapter = OrderAdapter(orderList) { order ->
+            // Handle item click
+            val intent = Intent(this, OrderDetailActivity::class.java)
+            intent.putExtra("ORDER_ID", order.id)
+            startActivity(intent)
+        }
+
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@OrderListActivity)
+            adapter = orderAdapter
+        }
+    }
 
     private fun setupClickListeners() {
         // Filter by status

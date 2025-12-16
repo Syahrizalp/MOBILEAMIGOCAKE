@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Admin Mobile Amigo</string>
+    <string name="order_recap_title">Order Recap</string>
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Fill out the details to get started</string>
+    <string name="logo_description">Logo</string>
+    <string name="username_icon_desc">Username Icon</string>
+    <string name="password_icon_desc">Password Icon</string>
+    <string name="confirm_password_icon_desc">Confirm Password Icon</string>
+    <string name="hint_username_email">Username or Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="button_signup">Sign Up</string>
+    <string name="text_already_have_account">Already have an account? Sign In</string>
+    <string name="recap_page_info">Anda sudah berada di halaman Rekap Order.</string>
+    <string name="total_order_format">Total Order : %1$d Order</string>
+    <string name="total_pendapatan_format">Total Pendapatan : %1$s</string>
+
+    <string name="month_picker_info">Membuka pemilih bulan...</string>
+
+    <!-- Array Bulan untuk DatePicker -->
+    <string-array name="months_array">
+        <item>Januari</item>
+        <item>Februari</item>
+        <item>Maret</item>
+        <item>April</item>
+        <item>Mei</item>
+        <item>Juni</item>
+        <item>Juli</item>
+        <item>Agustus</item>
+        <item>September</item>
+        <item>Oktober</item>
+        <item>November</item>
+        <item>Desember</item>
+    </string-array>
+</resources>

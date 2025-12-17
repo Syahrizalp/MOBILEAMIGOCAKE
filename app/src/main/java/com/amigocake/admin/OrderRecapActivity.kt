@@ -1,12 +1,13 @@
 package com.amigocake.admin
 
-import android.app.DatePickerDialog
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +23,6 @@ import com.google.android.material.button.MaterialButton
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.DateFormatSymbols
 import java.text.NumberFormat
 import java.util.*
 
@@ -37,6 +37,11 @@ class OrderRecapActivity : AppCompatActivity() {
     private var selectedMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var selectedYear = Calendar.getInstance().get(Calendar.YEAR)
 
+    private val monthNames = arrayOf(
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_recap)
@@ -48,9 +53,7 @@ class OrderRecapActivity : AppCompatActivity() {
         setupProfileClick()
 
         // Set initial month text
-        val calendar = Calendar.getInstance()
-        val monthName = DateFormatSymbols().months[calendar.get(Calendar.MONTH)]
-        btnMonthPicker.text = "$monthName ${calendar.get(Calendar.YEAR)}"
+        updateMonthButtonText()
 
         loadRecapData(selectedMonth, selectedYear)
     }
@@ -105,7 +108,7 @@ class OrderRecapActivity : AppCompatActivity() {
         }
     }
 
-    // ================= MONTH PICKER =================
+    // ================= MONTH & YEAR PICKER =================
     private fun setupMonthPicker() {
         btnMonthPicker.setOnClickListener {
             showMonthYearPicker()
@@ -113,33 +116,53 @@ class OrderRecapActivity : AppCompatActivity() {
     }
 
     private fun showMonthYearPicker() {
-        val calendar = Calendar.getInstance()
-        calendar.set(selectedYear, selectedMonth - 1, 1)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_month_year_picker, null)
 
-        DatePickerDialog(
-            this,
-            { _, year, month, _ ->
-                selectedMonth = month + 1
-                selectedYear = year
+        val monthPicker = dialogView.findViewById<NumberPicker>(R.id.month_picker)
+        val yearPicker = dialogView.findViewById<NumberPicker>(R.id.year_picker)
 
-                val monthName = DateFormatSymbols().months[month]
-                btnMonthPicker.text = "$monthName $year"
+        // Setup Month Picker
+        monthPicker.apply {
+            minValue = 0
+            maxValue = 11
+            value = selectedMonth - 1
+            displayedValues = monthNames
+            wrapSelectorWheel = true
+        }
 
+        // Setup Year Picker
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        yearPicker.apply {
+            minValue = currentYear - 10 // 10 tahun ke belakang
+            maxValue = currentYear + 5   // 5 tahun ke depan
+            value = selectedYear
+            wrapSelectorWheel = false
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Pilih Bulan dan Tahun")
+            .setView(dialogView)
+            .setPositiveButton("OK") { _, _ ->
+                selectedMonth = monthPicker.value + 1
+                selectedYear = yearPicker.value
+
+                updateMonthButtonText()
                 loadRecapData(selectedMonth, selectedYear)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun updateMonthButtonText() {
+        btnMonthPicker.text = "${monthNames[selectedMonth - 1]} $selectedYear"
     }
 
     // ================= LOAD DATA (API) =================
     private fun loadRecapData(month: Int, year: Int) {
         Log.d("RECAP", "Loading data for month: $month, year: $year")
 
-        val apiService = ApiConfig.apiService
-
-        apiService.getOrderRecap(month, year)
+        // ✅ PERBAIKAN: Gunakan ApiConfig.apiService langsung
+        ApiConfig.apiService.getOrderRecap(month, year)
             .enqueue(object : Callback<OrderRecapResponse> {
 
                 override fun onResponse(

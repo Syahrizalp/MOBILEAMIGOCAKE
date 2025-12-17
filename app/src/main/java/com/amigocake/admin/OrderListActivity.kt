@@ -199,7 +199,7 @@ class OrderListActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, TopicActivity::class.java))
+            startActivity(Intent(this, ManagementOrderActivity::class.java))
         }
     }
 }

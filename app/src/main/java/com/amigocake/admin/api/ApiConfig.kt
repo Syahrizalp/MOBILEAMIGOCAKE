@@ -8,11 +8,9 @@ import java.util.concurrent.TimeUnit
 
 object ApiConfig {
 
-    private const val BASE_URL =
-        "https://amigocake.com/frontend_costumer/api/"
+    private const val BASE_URL = "https://amigocake.com/frontend_costumer/api/"
 
     private val retrofit: Retrofit by lazy {
-
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -33,4 +31,7 @@ object ApiConfig {
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }
+
+    // Fungsi helper ini sudah tidak diperlukan lagi
+    // Karena kita sudah punya val apiService di atas
 }

@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/homebg"
-    tools:context=".TopicActivity">
+    tools:context="ManagementOrderActivity">
 
     <!-- Header & Logo -->
     <ImageView
-        android:id="@+id/iv_admin_icon"
+        android:id="@+id/iv_admin_icon1"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginTop="24dp"
@@ -45,7 +45,7 @@
 
     <!-- Konten Utama: RecyclerView untuk Daftar Topik/Kategori -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewTopics"
+        android:id="@+id/recyclerViewManagement"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
@@ -60,7 +60,7 @@
 
     <!-- Tombol Tambah (FAB) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddTopic"
+        android:id="@+id/fabAddManagement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"

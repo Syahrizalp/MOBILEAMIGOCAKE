@@ -13,4 +13,11 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!-- NumberPicker Theme untuk Month Year Picker -->
+    <style name="NumberPickerTheme">
+        <item name="colorControlNormal">#982B15</item>
+        <item name="colorControlActivated">#982B15</item>
+        <item name="android:textColorPrimary">#3A3135</item>
+    </style>
 </resources>

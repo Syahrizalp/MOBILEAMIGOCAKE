@@ -5,6 +5,8 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -16,6 +18,8 @@ import com.amigocake.admin.models.OrderResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,6 +43,7 @@ class OrderManualActivity : AppCompatActivity() {
         setContentView(R.layout.activity_order_manual)
 
         initViews()
+        setupPriceFormatter()
         setupClickListeners()
         setupNavigation()
     }
@@ -53,6 +58,53 @@ class OrderManualActivity : AppCompatActivity() {
         inputPickupDate = findViewById(R.id.input_pickup_date)
         inputPrice = findViewById(R.id.input_price)
         buttonOrder = findViewById(R.id.button_order)
+    }
+
+    // ================= PRICE FORMATTER =================
+    private fun setupPriceFormatter() {
+        inputPrice.addTextChangedListener(object : TextWatcher {
+            private var isFormatting = false
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isFormatting) return
+
+                isFormatting = true
+
+                // Hapus semua karakter non-digit
+                val cleanString = s.toString().replace("[^\\d]".toRegex(), "")
+
+                if (cleanString.isNotEmpty()) {
+                    try {
+                        // Format dengan pemisah ribuan
+                        val formatted = formatRupiah(cleanString.toLong())
+                        inputPrice.setText(formatted)
+                        inputPrice.setSelection(formatted.length)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                isFormatting = false
+            }
+        })
+    }
+
+    // Format angka dengan pemisah ribuan (titik)
+    private fun formatRupiah(value: Long): String {
+        val symbols = DecimalFormatSymbols(Locale("id", "ID"))
+        symbols.groupingSeparator = '.'
+        val formatter = DecimalFormat("#,###", symbols)
+        return formatter.format(value)
+    }
+
+    // Ambil nilai price sebagai integer (tanpa format)
+    private fun getPriceValue(): Int {
+        val cleanString = inputPrice.text.toString().replace("[^\\d]".toRegex(), "")
+        return if (cleanString.isNotEmpty()) cleanString.toInt() else 0
     }
 
     private fun setupClickListeners() {
@@ -113,15 +165,13 @@ class OrderManualActivity : AppCompatActivity() {
         val address = inputAddress.text.toString().trim()
         val productName = inputProductName.text.toString().trim()
         val diameter = inputDiameter.text.toString().trim()
-        val priceStr = inputPrice.text.toString().trim()
+        val price = getPriceValue() // ✅ Gunakan fungsi getPriceValue()
 
         if (customerName.isEmpty() || customerContact.isEmpty() ||
-            address.isEmpty() || selectedDate.isEmpty() || priceStr.isEmpty()) {
+            address.isEmpty() || selectedDate.isEmpty() || price == 0) {
             Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show()
             return
         }
-
-        val price = priceStr.toIntOrNull() ?: 0
 
         // Get user ID from SharedPreferences
         val sharedPreferences = getSharedPreferences("AmigoCakePrefs", Context.MODE_PRIVATE)

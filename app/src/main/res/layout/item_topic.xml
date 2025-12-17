@@ -15,22 +15,22 @@
         android:layout_height="wrap_content"
         android:paddingVertical="14dp"
         android:paddingStart="16dp"
-        android:paddingEnd="12dp"> <!-- Padding Akhir Diperlebar -->
+        android:paddingEnd="12dp">
 
-        <!-- Ikon Kategori/Tag (Pusat Vertikal) -->
+        <!-- Ikon Kategori -->
         <ImageView
             android:id="@+id/ivTopicIcon"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:contentDescription="Category Icon"
+            android:importantForAccessibility="no"
             android:src="@drawable/ikon_tag"
             app:tint="@color/dark_gray_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.5"/>
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-        <!-- Nama Kategori (DIPUSATKAN VERTIKAL di tengah CardView) -->
+        <!-- Nama Kategori -->
         <TextView
             android:id="@+id/tvTopicName"
             android:layout_width="0dp"
@@ -40,21 +40,36 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/dark_gray_title"
-            app:layout_constraintStart_toEndOf="@+id/ivTopicIcon"
-
+            android:importantForAccessibility="yes"
+            app:layout_constraintStart_toEndOf="@id/ivTopicIcon"
+            app:layout_constraintEnd_toStartOf="@id/btnEditTopic"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-
-            app:layout_constraintEnd_toStartOf="@+id/btnDeleteTopic"
-            app:layout_constraintHorizontal_bias="0.0"
             tools:text="Kue Ulang Tahun Premium" />
 
-        <!-- Tombol Hapus (Dibuat lebar dan mudah diakses) -->
+        <!-- Tombol EDIT -->
+        <ImageView
+            android:id="@+id/btnEditTopic"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Edit Kategori"
+            android:src="@drawable/ikon_edit"
+            app:tint="@color/dark_gray_title"
+            app:layout_constraintEnd_toStartOf="@id/btnDeleteTopic"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Tombol HAPUS -->
         <ImageView
             android:id="@+id/btnDeleteTopic"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
             android:contentDescription="Hapus Kategori"
             android:src="@drawable/ikon_delete"
             app:tint="@color/red_production"

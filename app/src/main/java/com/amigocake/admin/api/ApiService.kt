@@ -55,4 +55,11 @@ interface ApiService {
     // ========== GALERY API ==========
     @GET("galery.php")
     fun getAllGalery(): Call<ApiResponse<List<Galery>>>
+
+    // ========== RECAP API ==========
+    @GET("recap.php")
+    fun getOrderRecap(
+        @Query("month") month: Int,
+        @Query("year") year: Int
+    ): Call<OrderRecapResponse>
 }

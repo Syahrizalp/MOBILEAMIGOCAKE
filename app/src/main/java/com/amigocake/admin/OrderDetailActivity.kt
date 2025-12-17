@@ -90,7 +90,7 @@ class OrderDetailActivity : AppCompatActivity() {
     private fun loadOrderDetail() {
         showLoading(true)
 
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.apiService
         apiService.getOrderById(orderId).enqueue(object : Callback<ApiResponse<Order>> {
             override fun onResponse(
                 call: Call<ApiResponse<Order>>,
@@ -190,7 +190,7 @@ class OrderDetailActivity : AppCompatActivity() {
                 harga = order.harga
             )
 
-            val apiService = ApiConfig.getApiService()
+            val apiService = ApiConfig.apiService
             apiService.updateOrder(updateRequest).enqueue(object : Callback<ApiResponse<String>> {
                 override fun onResponse(
                     call: Call<ApiResponse<String>>,
@@ -246,7 +246,7 @@ class OrderDetailActivity : AppCompatActivity() {
     private fun deleteOrder() {
         showLoading(true)
 
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.apiService
         apiService.deleteOrder(orderId).enqueue(object : Callback<ApiResponse<String>> {
             override fun onResponse(
                 call: Call<ApiResponse<String>>,

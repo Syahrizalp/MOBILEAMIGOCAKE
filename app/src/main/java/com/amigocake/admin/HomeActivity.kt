@@ -63,7 +63,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun loadDashboardStats() {
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.apiService
 
         apiService.getDashboardStatistics().enqueue(object : Callback<ApiResponse<DashboardStats>> {
             override fun onResponse(

@@ -148,7 +148,7 @@ class OrderManualActivity : AppCompatActivity() {
         buttonOrder.text = "Saving..."
 
         // API call
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.apiService
         apiService.createOrder(orderRequest).enqueue(object : Callback<ApiResponse<OrderResponse>> {
             override fun onResponse(
                 call: Call<ApiResponse<OrderResponse>>,

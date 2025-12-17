@@ -81,15 +81,18 @@
                 android:layout_width="0dp"
                 android:layout_height="220dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="72dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginTop="24dp"
-                android:padding="8dp"
                 android:background="@drawable/kotakrecap"
+                android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/buttonMonthPicker" />
+
             <ImageView
                 android:id="@+id/imageView6"
+                android:text="@string/total_order_format"
                 android:layout_width="0dp"
                 android:layout_height="78dp"
                 android:layout_marginTop="16dp"
@@ -106,10 +109,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:text="@string/total_order_format"
+                android:text=""
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#3A3135" tools:text="Total Order : 200 Order"
+                android:textColor="#3A3135"
+                tools:text="Total Order : 36 Order"
                 app:layout_constraintBottom_toTopOf="@+id/tv_total_revenue"
                 app:layout_constraintStart_toStartOf="@+id/imageView6"
                 app:layout_constraintTop_toTopOf="@+id/imageView6"
@@ -120,13 +124,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/total_pendapatan_format"
+                android:text=""
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#3A3135" tools:text="Total Pendapatan : 5.000.000,00"
+                android:textColor="#3A3135"
+                tools:text="Total Pendapatan : Rp 1.061.666"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView6"
                 app:layout_constraintStart_toStartOf="@+id/tv_total_orders"
                 app:layout_constraintTop_toBottomOf="@+id/tv_total_orders" />
+
 
             <Space
                 android:layout_width="match_parent"

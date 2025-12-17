@@ -83,7 +83,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/filter_status_button"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="55dp"
                     android:layout_marginEnd="8dp"
                     android:backgroundTint="@android:color/white"
                     android:elevation="4dp"
@@ -100,7 +100,7 @@
                 <EditText
                     android:id="@+id/search_input"
                     android:layout_width="0dp"
-                    android:layout_height="45dp"
+                    android:layout_height="50dp"
                     android:background="@drawable/bg_putih_search"
                     android:drawableStart="@drawable/ikon_search"
                     android:drawablePadding="8dp"
@@ -117,7 +117,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/filter_sort_button"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="55dp"
                     android:layout_marginStart="8dp"
                     android:backgroundTint="@android:color/white"
                     android:elevation="4dp"

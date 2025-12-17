@@ -78,7 +78,7 @@ class OrderListActivity : AppCompatActivity() {
     }
 
     private fun loadOrders(status: String = "all") {
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.apiService
 
         val call = if (status == "all") {
             apiService.getAllOrders()

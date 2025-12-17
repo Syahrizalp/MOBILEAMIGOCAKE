@@ -66,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton.text = "Loading..."
 
         val loginRequest = LoginRequest(username, password)
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.apiService
 
         apiService.login(loginRequest).enqueue(object : Callback<ApiResponse<User>> {
             override fun onResponse(

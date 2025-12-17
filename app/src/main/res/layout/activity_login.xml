@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:background="@drawable/bg_header_gradient"
         android:padding="24dp"
         app:layout_constraintEnd_toEndOf="parent"

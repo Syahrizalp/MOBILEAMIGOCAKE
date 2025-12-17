@@ -223,3 +223,34 @@ data class Galery(
     @SerializedName("created_at")
     val createdAt: String
 )
+
+// ========== Order Recap ==========
+data class OrderRecapResponse(
+    @SerializedName("success")
+    val success: Boolean,
+
+    @SerializedName("message")
+    val message: String,
+
+    @SerializedName("data")
+    val data: RecapData?
+)
+
+data class RecapData(
+    @SerializedName("totalOrder")
+    val totalOrder: Int,
+
+    @SerializedName("totalPendapatan")
+    val totalPendapatan: Int,
+
+    @SerializedName("chart")
+    val chart: List<ChartItem>
+)
+
+data class ChartItem(
+    @SerializedName("day")
+    val day: Int,
+
+    @SerializedName("total")
+    val total: String
+)

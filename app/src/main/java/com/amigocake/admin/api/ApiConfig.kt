@@ -8,30 +8,29 @@ import java.util.concurrent.TimeUnit
 
 object ApiConfig {
 
-    // GANTI dengan URL hosting Anda
-    // Karena api ada di frontend_costumer/api/
-    private const val BASE_URL = "https://amigocake.com/frontend_costumer/api/"
+    private const val BASE_URL =
+        "https://amigocake.com/frontend_costumer/api/"
 
-    private fun getOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
+    private val retrofit: Retrofit by lazy {
+
+        val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
-    fun getApiService(): ApiService {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(getOkHttpClient())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        return retrofit.create(ApiService::class.java)
+    val apiService: ApiService by lazy {
+        retrofit.create(ApiService::class.java)
     }
 }

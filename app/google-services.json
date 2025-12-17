@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "516317872610",
+    "project_id": "amigocakepbl",
+    "storage_bucket": "amigocakepbl.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516317872610:android:6da253a2004fb5358e79bb",
+        "android_client_info": {
+          "package_name": "com.amigocake.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb6oI8pensvCIr0drRHzlSuqOTPCm4afE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516317872610:android:2df8e973015cefbc8e79bb",
+        "android_client_info": {
+          "package_name": "com.mobile.amigomobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb6oI8pensvCIr0drRHzlSuqOTPCm4afE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

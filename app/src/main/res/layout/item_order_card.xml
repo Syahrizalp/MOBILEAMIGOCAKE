@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
@@ -14,21 +16,25 @@
 
         <TextView
             android:id="@+id/tv_item_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Nama Produk"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:textColor="#3A3135"
+            app:layout_constraintEnd_toStartOf="@+id/tv_order_date"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_customer_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:text="Nama Pelanggan"
             android:textSize="12sp"
+            android:textColor="#6E6266"
+            app:layout_constraintEnd_toStartOf="@id/tv_order_date"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_item_name" />
 
@@ -38,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Rp 150.000"
-            android:textColor="@color/black"
+            android:textColor="#982B15"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,12 +54,13 @@
             android:id="@+id/tv_order_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="x3"
+            android:layout_marginStart="4dp"
+            android:text="x1"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_order_amount"
-            app:layout_constraintStart_toEndOf="@+id/tv_order_amount"
-            app:layout_constraintTop_toTopOf="@+id/tv_order_amount" />
+            android:textColor="#6E6266"
+            app:layout_constraintBottom_toBottomOf="@id/tv_order_amount"
+            app:layout_constraintStart_toEndOf="@id/tv_order_amount"
+            app:layout_constraintTop_toTopOf="@id/tv_order_amount" />
 
         <TextView
             android:id="@+id/tv_order_status"
@@ -61,24 +68,23 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_paid"
-            android:paddingBottom="2dp"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:paddingTop="2dp"
+            android:paddingVertical="2dp"
+            android:paddingHorizontal="8dp"
             android:text="Status"
             android:textColor="#388E3C"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_order_amount" /> <TextView
-        android:id="@+id/tv_order_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tanggal"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tv_order_amount" />
+
+        <TextView
+            android:id="@+id/tv_order_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01 Jan 2024"
+            android:textSize="12sp"
+            android:textColor="#6E6266"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.cardview.widget.CardView>

@@ -57,7 +57,7 @@ interface ApiService {
     fun getAllGalery(): Call<ApiResponse<List<Galery>>>
 
     // ========== RECAP API ==========
-    @GET("recap.php")
+    @GET("order_recap.php")
     fun getOrderRecap(
         @Query("month") month: Int,
         @Query("year") year: Int

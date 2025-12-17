@@ -85,7 +85,7 @@ class OrderRecapActivity : AppCompatActivity() {
                 textColor = Color.BLACK
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        return value.toInt().toString()
+                        return "${value.toInt()} ${monthNames[selectedMonth - 1]}"
                     }
                 }
             }
@@ -93,8 +93,13 @@ class OrderRecapActivity : AppCompatActivity() {
             // Left Y Axis
             axisLeft.apply {
                 setDrawGridLines(true)
-                granularity = 1f
+                granularity = 1000f  // Kelipatan 1000 untuk rupiah
                 textColor = Color.BLACK
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return formatRupiahShort(value.toInt())
+                    }
+                }
             }
 
             // Right Y Axis
@@ -133,8 +138,8 @@ class OrderRecapActivity : AppCompatActivity() {
         // Setup Year Picker
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         yearPicker.apply {
-            minValue = currentYear - 10 // 10 tahun ke belakang
-            maxValue = currentYear + 5   // 5 tahun ke depan
+            minValue = currentYear - 2 // 2 tahun ke belakang
+            maxValue = currentYear     // Hingga tahun ini
             value = selectedYear
             wrapSelectorWheel = false
         }
@@ -161,7 +166,9 @@ class OrderRecapActivity : AppCompatActivity() {
     private fun loadRecapData(month: Int, year: Int) {
         Log.d("RECAP", "Loading data for month: $month, year: $year")
 
-        // ✅ PERBAIKAN: Gunakan ApiConfig.apiService langsung
+        // Tampilkan loading state
+        showLoading(true)
+
         ApiConfig.apiService.getOrderRecap(month, year)
             .enqueue(object : Callback<OrderRecapResponse> {
 
@@ -169,15 +176,13 @@ class OrderRecapActivity : AppCompatActivity() {
                     call: Call<OrderRecapResponse>,
                     response: Response<OrderRecapResponse>
                 ) {
+                    showLoading(false)
+
                     Log.d("RECAP", "Response code: ${response.code()}")
 
                     if (!response.isSuccessful) {
                         Log.e("RECAP", "HTTP Error: ${response.code()}")
-                        Toast.makeText(
-                            this@OrderRecapActivity,
-                            "Error loading data: ${response.code()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showEmptyState("Error: ${response.code()}")
                         return
                     }
 
@@ -186,27 +191,20 @@ class OrderRecapActivity : AppCompatActivity() {
 
                     if (recapResponse == null) {
                         Log.e("RECAP", "Response body is null")
-                        Toast.makeText(
-                            this@OrderRecapActivity,
-                            "No data received",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showEmptyState("Tidak ada data diterima")
                         return
                     }
 
                     if (!recapResponse.success) {
                         Log.e("RECAP", "API returned success=false: ${recapResponse.message}")
-                        Toast.makeText(
-                            this@OrderRecapActivity,
-                            recapResponse.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showEmptyState(recapResponse.message)
                         return
                     }
 
                     val data = recapResponse.data
                     if (data == null) {
                         Log.e("RECAP", "Data is null")
+                        showEmptyState("Data kosong")
                         return
                     }
 
@@ -215,25 +213,50 @@ class OrderRecapActivity : AppCompatActivity() {
                     Log.d("RECAP", "Chart data size: ${data.chart.size}")
 
                     // Update UI
-                    tvTotalOrders.text = "Total Order : ${data.totalOrder} Order"
-                    tvTotalRevenue.text = "Total Pendapatan : ${formatRupiah(data.totalPendapatan)}"
-
-                    // Update Chart
-                    updateChart(data.chart)
+                    updateUI(data)
                 }
 
                 override fun onFailure(
                     call: Call<OrderRecapResponse>,
                     t: Throwable
                 ) {
+                    showLoading(false)
                     Log.e("RECAP", "API Call Failed", t)
-                    Toast.makeText(
-                        this@OrderRecapActivity,
-                        "Error: ${t.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showEmptyState("Gagal menghubungi server")
                 }
             })
+    }
+
+    private fun showLoading(show: Boolean) {
+        // Anda bisa tambah ProgressBar di XML jika mau
+        if (show) {
+            lineChart.visibility = android.view.View.GONE
+            tvTotalOrders.text = "Memuat data..."
+            tvTotalRevenue.text = ""
+        } else {
+            lineChart.visibility = android.view.View.VISIBLE
+        }
+    }
+
+    private fun showEmptyState(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        lineChart.clear()
+        lineChart.invalidate()
+        tvTotalOrders.text = "Total Order : 0 Order"
+        tvTotalRevenue.text = "Total Pendapatan : Rp 0"
+    }
+
+    private fun updateUI(data: com.amigocake.admin.models.RecapData) {
+        tvTotalOrders.text = "Total Order : ${data.totalOrder} Order"
+        tvTotalRevenue.text = "Total Pendapatan : ${formatRupiah(data.totalPendapatan)}"
+
+        if (data.totalPendapatan > 0) {
+            updateChart(data.chart)
+        } else {
+            lineChart.clear()
+            lineChart.invalidate()
+            lineChart.setNoDataText("Tidak ada transaksi di bulan ini")
+        }
     }
 
     // ================= UPDATE CHART =================
@@ -249,12 +272,13 @@ class OrderRecapActivity : AppCompatActivity() {
 
         val entries = mutableListOf<Entry>()
 
-        for (item in chartData) {
-            val total = item.total.toFloatOrNull()
-            if (total != null) {
-                entries.add(Entry(item.day.toFloat(), total))
-                Log.d("RECAP", "Chart entry: day=${item.day}, total=$total")
-            }
+        // Sort by day
+        val sortedChartData = chartData.sortedBy { it.day }
+
+        for (item in sortedChartData) {
+            val total = item.total.toFloatOrNull() ?: 0f
+            entries.add(Entry(item.day.toFloat(), total))
+            Log.d("RECAP", "Chart entry: day=${item.day}, total=$total")
         }
 
         if (entries.isEmpty()) {
@@ -264,13 +288,20 @@ class OrderRecapActivity : AppCompatActivity() {
             return
         }
 
-        val dataSet = LineDataSet(entries, "Pendapatan Harian (Rp)").apply {
+        val dataSet = LineDataSet(entries, "Pendapatan Harian").apply {
             color = Color.parseColor("#982B15")
             lineWidth = 2.5f
             setCircleColor(Color.parseColor("#982B15"))
             circleRadius = 4f
             setDrawCircleHole(false)
-            setDrawValues(false)
+            setDrawValues(true)
+            valueTextSize = 10f
+            valueTextColor = Color.BLACK
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return formatRupiahShort(value.toInt())
+                }
+            }
             mode = LineDataSet.Mode.CUBIC_BEZIER
             cubicIntensity = 0.2f
             setDrawFilled(true)
@@ -281,6 +312,10 @@ class OrderRecapActivity : AppCompatActivity() {
         val lineData = LineData(dataSet)
         lineChart.data = lineData
         lineChart.animateX(1000)
+
+        // Set viewport untuk menampilkan semua data
+        lineChart.xAxis.axisMinimum = 1f
+        lineChart.xAxis.axisMaximum = 31f
         lineChart.invalidate()
 
         Log.d("RECAP", "Chart updated successfully")
@@ -322,5 +357,15 @@ class OrderRecapActivity : AppCompatActivity() {
         val localeID = Locale("id", "ID")
         val format = NumberFormat.getCurrencyInstance(localeID)
         return format.format(value).replace("Rp", "Rp ")
+    }
+
+    private fun formatRupiahShort(value: Int): String {
+        return if (value >= 1000000) {
+            "Rp${value / 1000000}JT"
+        } else if (value >= 1000) {
+            "Rp${value / 1000}K"
+        } else {
+            "Rp$value"
+        }
     }
 }

@@ -42,6 +42,7 @@ data class RegisterRequest(
 )
 
 // ========== Order ==========
+// ========== Order ==========
 data class Order(
     @SerializedName("id")
     val id: Int = 0,
@@ -56,16 +57,16 @@ data class Order(
     val idProduct: Int? = null,
 
     @SerializedName("nama_pemesan")
-    val namaPemesan: String,
+    val namaPemesan: String = "",
 
     @SerializedName("telp")
-    val telp: String,
+    val telp: String = "",
 
     @SerializedName("alamat")
-    val alamat: String,
+    val alamat: String = "",
 
     @SerializedName("tanggal")
-    val tanggal: String,
+    val tanggal: String = "",
 
     @SerializedName("diameter")
     val diameter: String? = "",
@@ -77,7 +78,7 @@ data class Order(
     val tulisan: String? = "",
 
     @SerializedName("harga")
-    val harga: Int = 0,
+    val harga: Int? = null,
 
     @SerializedName("waktu")
     val waktu: String? = null,
@@ -92,7 +93,17 @@ data class Order(
     val customerName: String? = null,
 
     @SerializedName("NAMA_PRODUCT")
-    val namaProduct: String? = null
+    val namaProduct: String? = null,
+
+    // Tambahkan field untuk payment/bukti pembayaran
+    @SerializedName("bukti_bayar")
+    val buktiBayar: String? = null,
+
+    @SerializedName("payment_method")
+    val paymentMethod: String? = null,
+
+    @SerializedName("payment_date")
+    val paymentDate: String? = null
 )
 
 // ========== Order Request (untuk create order) ==========
@@ -142,26 +153,13 @@ data class OrderResponse(
 
 // ========== Order Update Request ==========
 data class OrderUpdateRequest(
-    @SerializedName("id")
-    val id: Int,
-
-    @SerializedName("status")
-    val status: String,
-
-    @SerializedName("nama_pemesan")
-    val namaPemesan: String,
-
-    @SerializedName("telp")
-    val telp: String,
-
-    @SerializedName("alamat")
-    val alamat: String,
-
-    @SerializedName("tanggal")
-    val tanggal: String,
-
-    @SerializedName("harga")
-    val harga: Int
+    val id: Int? = null, // Ubah menjadi nullable
+    val status: String? = null,
+    val namaPemesan: String? = null,
+    val telp: String? = null,
+    val alamat: String? = null,
+    val tanggal: String? = null,
+    val harga: Int? = null
 )
 
 // ========== Product ==========

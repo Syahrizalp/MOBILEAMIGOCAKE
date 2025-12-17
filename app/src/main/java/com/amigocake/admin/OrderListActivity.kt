@@ -2,7 +2,12 @@ package com.amigocake.admin
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,9 +28,12 @@ class OrderListActivity : AppCompatActivity() {
     private lateinit var searchInput: EditText
     private lateinit var filterStatusButton: MaterialButton
     private lateinit var filterSortButton: MaterialButton
+    private lateinit var tvEmptyState: TextView
 
-    private var orderList = mutableListOf<Order>()
+    private var allOrders = mutableListOf<Order>() // Semua order
+    private var displayedOrders = mutableListOf<Order>() // Order yang ditampilkan
     private var currentStatus = "all"
+    private var currentSort = 0 // 0=Terbaru, 1=Terlama, 2=Harga Tertinggi, 3=Harga Terendah
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +51,12 @@ class OrderListActivity : AppCompatActivity() {
         searchInput = findViewById(R.id.search_input)
         filterStatusButton = findViewById(R.id.filter_status_button)
         filterSortButton = findViewById(R.id.filter_sort_button)
+        tvEmptyState = findViewById(R.id.tv_empty_state)
     }
 
     private fun setupRecyclerView() {
-        orderAdapter = OrderAdapter(orderList) { order ->
-            // Handle item click
+        orderAdapter = OrderAdapter(displayedOrders) { order ->
+            // Handle item click - Navigasi ke OrderDetailActivity
             val intent = Intent(this, OrderDetailActivity::class.java)
             intent.putExtra("ORDER_ID", order.id)
             startActivity(intent)
@@ -56,6 +65,7 @@ class OrderListActivity : AppCompatActivity() {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@OrderListActivity)
             adapter = orderAdapter
+            setHasFixedSize(true)
         }
     }
 
@@ -70,16 +80,21 @@ class OrderListActivity : AppCompatActivity() {
             showSortDialog()
         }
 
-        // Search functionality
-        searchInput.setOnEditorActionListener { _, _, _ ->
-            searchOrders(searchInput.text.toString())
-            true
-        }
+        // Search functionality dengan TextWatcher
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                searchOrders(s.toString())
+            }
+        })
     }
 
     private fun loadOrders(status: String = "all") {
-        val apiService = ApiConfig.apiService
+        Log.d("DEBUG_ORDER", "Loading orders with status: $status")
 
+        val apiService = ApiConfig.apiService
         val call = if (status == "all") {
             apiService.getAllOrders()
         } else {
@@ -95,47 +110,154 @@ class OrderListActivity : AppCompatActivity() {
                     val apiResponse = response.body()
 
                     if (apiResponse?.success == true && apiResponse.data != null) {
-                        orderList.clear()
-                        orderList.addAll(apiResponse.data)
-                        orderAdapter.notifyDataSetChanged()
+                        allOrders.clear()
+                        allOrders.addAll(apiResponse.data)
 
-                        Toast.makeText(
-                            this@OrderListActivity,
-                            "${orderList.size} orders loaded",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        // Apply filter status
+                        applyStatusFilter(status)
+
+                        // Apply search jika ada
+                        val query = searchInput.text.toString()
+                        if (query.isNotEmpty()) {
+                            searchOrders(query)
+                        } else {
+                            updateDisplayedOrders()
+                        }
+
+                        Log.d("DEBUG_ORDER", "Loaded ${allOrders.size} orders")
+
+                        runOnUiThread {
+                            if (displayedOrders.isEmpty()) {
+                                tvEmptyState.visibility = View.VISIBLE
+                                tvEmptyState.text = "Tidak ada order $status"
+                            } else {
+                                tvEmptyState.visibility = View.GONE
+                            }
+
+                            Toast.makeText(
+                                this@OrderListActivity,
+                                "${displayedOrders.size} order ditemukan",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     } else {
-                        Toast.makeText(
-                            this@OrderListActivity,
-                            apiResponse?.message ?: "Failed to load orders",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Log.e("DEBUG_ORDER", "API success=false or data null")
+                        runOnUiThread {
+                            tvEmptyState.visibility = View.VISIBLE
+                            tvEmptyState.text = apiResponse?.message ?: "Gagal memuat data"
+                            displayedOrders.clear()
+                            orderAdapter.updateList(displayedOrders)
+                        }
+                    }
+                } else {
+                    Log.e("DEBUG_ORDER", "Response not successful: ${response.code()}")
+                    runOnUiThread {
+                        tvEmptyState.visibility = View.VISIBLE
+                        tvEmptyState.text = "Error: ${response.code()}"
                     }
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<List<Order>>>, t: Throwable) {
-                Toast.makeText(
-                    this@OrderListActivity,
-                    "Error: ${t.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                Log.e("DEBUG_ORDER", "API Call Failed", t)
+                runOnUiThread {
+                    tvEmptyState.visibility = View.VISIBLE
+                    tvEmptyState.text = "Gagal terhubung ke server"
+                    Toast.makeText(
+                        this@OrderListActivity,
+                        "Error: ${t.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         })
     }
 
+    private fun applyStatusFilter(status: String) {
+        currentStatus = status
+
+        displayedOrders.clear()
+        if (status == "all") {
+            displayedOrders.addAll(allOrders)
+        } else {
+            displayedOrders.addAll(allOrders.filter { it.status == status })
+        }
+
+        // Apply current sort
+        applySort(currentSort)
+    }
+
     private fun searchOrders(query: String) {
         if (query.isEmpty()) {
-            loadOrders(currentStatus)
+            // Reset ke filtered list berdasarkan status
+            applyStatusFilter(currentStatus)
+            updateDisplayedOrders()
             return
         }
 
-        val filteredList = orderList.filter { order ->
-            order.namaPemesan.contains(query, ignoreCase = true) ||
-                    (order.namaProduct?.contains(query, ignoreCase = true) == true)
+        val filteredList = allOrders.filter { order ->
+            (order.namaPemesan.contains(query, ignoreCase = true)) ||
+                    (order.namaProduct?.contains(query, ignoreCase = true) == true) ||
+                    (order.telp.contains(query, ignoreCase = true)) ||
+                    (order.status?.contains(query, ignoreCase = true) == true)
         }
 
-        orderAdapter.updateList(filteredList)
+        // Filter lagi berdasarkan status
+        val statusFiltered = if (currentStatus == "all") {
+            filteredList
+        } else {
+            filteredList.filter { it.status == currentStatus }
+        }
+
+        displayedOrders.clear()
+        displayedOrders.addAll(statusFiltered)
+        applySort(currentSort)
+        updateDisplayedOrders()
+    }
+
+    private fun applySort(sortType: Int) {
+        currentSort = sortType
+
+        val sortedList = when (sortType) {
+            0 -> displayedOrders.sortedByDescending {
+                // Sort by created_at (terbaru)
+                it.createdAt ?: "1970-01-01"
+            }
+            1 -> displayedOrders.sortedBy {
+                // Sort by created_at (terlama)
+                it.createdAt ?: "1970-01-01"
+            }
+            2 -> displayedOrders.sortedByDescending {
+                // Sort by harga tertinggi
+                it.harga ?: 0
+            }
+            3 -> displayedOrders.sortedBy {
+                // Sort by harga terendah
+                it.harga ?: 0
+            }
+            else -> displayedOrders
+        }
+
+        displayedOrders.clear()
+        displayedOrders.addAll(sortedList)
+    }
+
+    private fun updateDisplayedOrders() {
+        runOnUiThread {
+            orderAdapter.updateList(displayedOrders)
+
+            if (displayedOrders.isEmpty()) {
+                tvEmptyState.visibility = View.VISIBLE
+                val query = searchInput.text.toString()
+                tvEmptyState.text = if (query.isNotEmpty()) {
+                    "Tidak ditemukan hasil untuk '$query'"
+                } else {
+                    "Tidak ada order $currentStatus"
+                }
+            } else {
+                tvEmptyState.visibility = View.GONE
+            }
+        }
     }
 
     private fun showStatusFilterDialog() {
@@ -165,19 +287,11 @@ class OrderListActivity : AppCompatActivity() {
             .setTitle("Sort by")
             .setItems(sortOptions) { _, which ->
                 filterSortButton.text = sortOptions[which]
-                sortOrders(which)
+                currentSort = which
+                applySort(which)
+                updateDisplayedOrders()
             }
             .show()
-    }
-
-    private fun sortOrders(sortType: Int) {
-        when (sortType) {
-            0 -> orderList.sortByDescending { it.createdAt }
-            1 -> orderList.sortBy { it.createdAt }
-            2 -> orderList.sortByDescending { it.harga }
-            3 -> orderList.sortBy { it.harga }
-        }
-        orderAdapter.notifyDataSetChanged()
     }
 
     private fun setupNavigation() {
@@ -199,7 +313,13 @@ class OrderListActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, ManagementOrderActivity::class.java))
+            startActivity(Intent(this, TopicActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh data ketika kembali ke layar
+        loadOrders(currentStatus)
     }
 }

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.amigocake.admin.api.ApiConfig
 import com.amigocake.admin.models.ApiResponse
 import com.amigocake.admin.models.DashboardStats
+import com.amigocake.admin.models.Order
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,6 +27,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var tvRevenueMonthValue: TextView
     private lateinit var tvDeadlineItemName: TextView
     private lateinit var tvDeadlineDate: TextView
+    private lateinit var ivProfileSettings: android.widget.ImageView
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -36,7 +38,7 @@ class HomeActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("AmigoCakePrefs", Context.MODE_PRIVATE)
 
         // Check login
-        if (!sharedPreferences.getBoolean("isLoggedIn", false)) {
+        if (!isUserLoggedIn()) {
             navigateToLogin()
             return
         }
@@ -47,6 +49,12 @@ class HomeActivity : AppCompatActivity() {
         loadDashboardStats()
     }
 
+    private fun isUserLoggedIn(): Boolean {
+        return sharedPreferences.getBoolean("isLoggedIn", false) &&
+                sharedPreferences.getInt("userId", 0) > 0 &&
+                sharedPreferences.getString("userLevel", "") == "ADMIN"
+    }
+
     private fun initViews() {
         tvGreeting = findViewById(R.id.tv_greeting)
         tvTotalOrderCount = findViewById(R.id.tv_total_order_count)
@@ -55,6 +63,7 @@ class HomeActivity : AppCompatActivity() {
         tvRevenueMonthValue = findViewById(R.id.tv_revenue_month_value)
         tvDeadlineItemName = findViewById(R.id.tv_deadline_item_name)
         tvDeadlineDate = findViewById(R.id.tv_deadline_date)
+        ivProfileSettings = findViewById(R.id.iv_profile_settings)
     }
 
     private fun setupGreeting() {
@@ -76,16 +85,25 @@ class HomeActivity : AppCompatActivity() {
                     if (apiResponse?.success == true && apiResponse.data != null) {
                         updateUI(apiResponse.data)
                     } else {
+                        showDefaultData()
                         Toast.makeText(
                             this@HomeActivity,
-                            apiResponse?.message ?: "Failed to load data",
+                            apiResponse?.message ?: "Gagal memuat data dashboard",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                } else {
+                    showDefaultData()
+                    Toast.makeText(
+                        this@HomeActivity,
+                        "Error server: ${response.code()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<DashboardStats>>, t: Throwable) {
+                showDefaultData()
                 Toast.makeText(
                     this@HomeActivity,
                     "Error: ${t.message}",
@@ -96,24 +114,55 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updateUI(stats: DashboardStats) {
-        // Update counters
+        // 1. TOTAL ORDER (Semua waktu)
         tvTotalOrderCount.text = stats.totalOrders.toString()
+
+        // 2. ORDER AKTIF (Process)
         tvOrderListCount.text = stats.activeOrders.toString()
 
-        // Update revenue
+        // 3. PENDAPATAN HARI INI
         tvRevenueTodayValue.text = formatRupiah(stats.revenueToday)
+
+        // 4. PENDAPATAN BULAN INI
         tvRevenueMonthValue.text = formatRupiah(stats.revenueMonth)
 
-        // Update nearest deadline
-        stats.nearestDeadline?.let { deadline ->
-            val itemName = deadline.namaProduct ?: "Custom Order"
-            val customerName = deadline.namaPemesan
-            tvDeadlineItemName.text = "$itemName ($customerName)"
-            tvDeadlineDate.text = formatDate(deadline.tanggal)
-        } ?: run {
-            tvDeadlineItemName.text = "No pending orders"
+        // 5. DEADLINE PESANAN TERDEKAT
+        updateDeadlineInfo(stats.nearestDeadline)
+    }
+
+    private fun updateDeadlineInfo(order: Order?) {
+        if (order != null) {
+            val itemName = order.namaProduct ?: "Custom Order"
+            val customerName = order.namaPemesan
+
+            // Jika ada info tambahan dari order
+            val displayText = if (order.diameter?.isNotEmpty() == true) {
+                "$itemName (${order.diameter}cm) - $customerName"
+            } else {
+                "$itemName - $customerName"
+            }
+
+            tvDeadlineItemName.text = displayText
+            tvDeadlineDate.text = formatDate(order.tanggal)
+
+            // Tampilkan juga waktu jika ada
+            if (!order.waktu.isNullOrEmpty()) {
+                tvDeadlineDate.text = "${formatDate(order.tanggal)} | ${order.waktu}"
+            }
+        } else {
+            tvDeadlineItemName.text = "Tidak ada deadline"
             tvDeadlineDate.text = "-"
         }
+    }
+
+    private fun showDefaultData() {
+        // Set default values jika gagal load data
+        tvTotalOrderCount.text = "0"
+        tvOrderListCount.text = "0"
+        tvRevenueTodayValue.text = formatRupiah(0)
+        tvRevenueMonthValue.text = formatRupiah(0)
+        tvDeadlineItemName.text = "Tidak ada data"
+        tvDeadlineDate.text = "-"
     }
 
     private fun formatRupiah(amount: Int): String {
@@ -148,9 +197,16 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, OrderListActivity::class.java))
         }
 
+        // Profile Icon - NAVIGASI KE PROFILE
+        ivProfileSettings.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         // Bottom Navigation
         findViewById<android.widget.LinearLayout>(R.id.nav_home_container).setOnClickListener {
-            // Already on home
+            // Already on home - refresh data
+            loadDashboardStats()
         }
 
         findViewById<android.widget.LinearLayout>(R.id.nav_manual_order_container).setOnClickListener {
@@ -166,22 +222,21 @@ class HomeActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, TopicActivity::class.java))
-        }
-
-        // Profile Icon
-        findViewById<android.widget.ImageView>(R.id.iv_profile_settings).setOnClickListener {
-            startActivity(Intent(this, ProfileActivity::class.java))
+            startActivity(Intent(this, ManagementOrderActivity::class.java))
         }
     }
 
     private fun navigateToLogin() {
-        startActivity(Intent(this, LoginActivity::class.java))
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
     }
 
     override fun onResume() {
         super.onResume()
-        loadDashboardStats() // Refresh data when returning to screen
+        // Refresh data when returning to screen
+        loadDashboardStats()
+        setupGreeting() // Update greeting jika nama berubah
     }
 }

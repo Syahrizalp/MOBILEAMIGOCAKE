@@ -10,6 +10,9 @@ object ApiConfig {
 
     private const val BASE_URL = "https://amigocake.com/frontend_costumer/api/"
 
+    // Tambahkan base URL untuk gambar
+    const val IMAGE_BASE_URL = "https://amigocake.com/frontend_costumer/uploads/bukti/"
+
     private val retrofit: Retrofit by lazy {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -32,6 +35,14 @@ object ApiConfig {
         retrofit.create(ApiService::class.java)
     }
 
-    // Fungsi helper ini sudah tidak diperlukan lagi
-    // Karena kita sudah punya val apiService di atas
+    // Fungsi untuk mendapatkan URL gambar lengkap
+    fun getImageUrl(imagePath: String?): String? {
+        return if (imagePath.isNullOrEmpty()) {
+            null
+        } else if (imagePath.startsWith("http")) {
+            imagePath
+        } else {
+            "$IMAGE_BASE_URL$imagePath"
+        }
+    }
 }

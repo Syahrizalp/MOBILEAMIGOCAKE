@@ -19,26 +19,32 @@ class OrderAdapter(
 ) : RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
 
     inner class OrderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView = itemView as CardView
+        val cardView: CardView = itemView.findViewById(R.id.cardView)
         val tvItemName: TextView = itemView.findViewById(R.id.tv_item_name)
         val tvCustomerName: TextView = itemView.findViewById(R.id.tv_customer_name)
         val tvOrderAmount: TextView = itemView.findViewById(R.id.tv_order_amount)
+        val tvOrderQuantity: TextView = itemView.findViewById(R.id.tv_order_quantity)
         val tvOrderStatus: TextView = itemView.findViewById(R.id.tv_order_status)
         val tvOrderDate: TextView = itemView.findViewById(R.id.tv_order_date)
 
         fun bind(order: Order) {
-            // Product name
+            // Product name - handle null
             tvItemName.text = order.namaProduct ?: "Custom Order"
 
-            // Customer name
+            // Customer name - handle non-nullable field (sesuai model Order)
             tvCustomerName.text = order.namaPemesan
 
-            // Amount
-            tvOrderAmount.text = formatRupiah(order.harga)
+            // Amount - handle null harga
+            val harga = order.harga ?: 0
+            tvOrderAmount.text = formatRupiah(harga)
 
-            // Status
-            tvOrderStatus.text = order.status
-            when (order.status) {
+            // Quantity - kosongkan atau isi jika ada (tidak ada field jumlah di model)
+            tvOrderQuantity.text = ""
+
+            // Status - handle berbagai status
+            val status = order.status ?: "Process" // order.status sudah non-nullable di model
+            tvOrderStatus.text = status
+            when (status) {
                 "Process" -> {
                     tvOrderStatus.setTextColor(Color.parseColor("#FF9800"))
                     tvOrderStatus.setBackgroundResource(R.drawable.bg_status_processing)
@@ -51,14 +57,55 @@ class OrderAdapter(
                     tvOrderStatus.setTextColor(Color.parseColor("#F44336"))
                     tvOrderStatus.setBackgroundResource(R.drawable.bg_status_canceled)
                 }
+                else -> {
+                    tvOrderStatus.setTextColor(Color.parseColor("#757575"))
+                    tvOrderStatus.setBackgroundResource(R.drawable.bg_status_processing)
+                }
             }
 
-            // Date
-            tvOrderDate.text = formatDate(order.tanggal)
+            // Date - handle parsing error
+            tvOrderDate.text = try {
+                // order.tanggal sudah non-nullable di model
+                formatDate(order.tanggal)
+            } catch (e: Exception) {
+                order.tanggal
+            }
 
             // Click listener
             cardView.setOnClickListener {
                 onItemClick(order)
+            }
+        }
+
+        // Fungsi helper untuk format Rupiah
+        private fun formatRupiah(amount: Int): String {
+            return try {
+                val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+                formatter.format(amount)
+            } catch (e: Exception) {
+                "Rp 0"
+            }
+        }
+
+        // Fungsi helper untuk format tanggal
+        private fun formatDate(dateStr: String): String {
+            return try {
+                // Coba format dengan tanggal dan waktu jika ada
+                val dateToParse = if (dateStr.contains(" ")) {
+                    // Format: yyyy-MM-dd HH:mm:ss
+                    val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    dateTimeFormat.parse(dateStr)
+                } else {
+                    // Format: yyyy-MM-dd
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    dateFormat.parse(dateStr)
+                }
+
+                val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
+                dateToParse?.let { outputFormat.format(it) } ?: dateStr
+            } catch (e: Exception) {
+                // Jika parsing gagal, coba format createdAt
+                dateStr
             }
         }
     }
@@ -78,21 +125,5 @@ class OrderAdapter(
     fun updateList(newList: List<Order>) {
         orders = newList
         notifyDataSetChanged()
-    }
-
-    private fun formatRupiah(amount: Int): String {
-        val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-        return formatter.format(amount)
-    }
-
-    private fun formatDate(dateStr: String): String {
-        return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
-            val date = inputFormat.parse(dateStr)
-            date?.let { outputFormat.format(it) } ?: dateStr
-        } catch (e: Exception) {
-            dateStr
-        }
     }
 }

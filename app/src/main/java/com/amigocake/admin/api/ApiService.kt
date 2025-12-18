@@ -38,15 +38,22 @@ interface ApiService {
     @DELETE("orders.php")
     fun deleteOrder(@Query("id") orderId: Int): Call<ApiResponse<String>>
 
-    // ========== PRODUCTS API ==========
+    // PRODUCT API
     @GET("products.php")
     fun getAllProducts(): Call<ApiResponse<List<Product>>>
 
     @GET("products.php")
     fun getProductById(@Query("id") productId: Int): Call<ApiResponse<Product>>
 
-    @GET("products.php")
-    fun getProductsByCategory(@Query("kategori") category: String): Call<ApiResponse<List<Product>>>
+    @DELETE("products.php")
+    fun deleteProduct(@Query("id") productId: Int): Call<ApiResponse<String>>
+
+    // Untuk create dan update, jika belum ada:
+    @POST("products.php")
+    fun createProduct(@Body productData: Map<String, Any>): Call<ApiResponse<Map<String, Int>>>
+
+    @PUT("products.php")
+    fun updateProduct(@Body productData: Map<String, Any>): Call<ApiResponse<String>>
 
     // ========== STATISTICS API ==========
     @GET("statistics.php")

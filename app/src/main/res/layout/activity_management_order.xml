@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Manajemen Kategori Kue"
+        android:text="Manajemen Produk Kue"
         android:textSize="30sp"
         android:textStyle="bold"
         android:textColor="#3A3135" app:layout_constraintEnd_toEndOf="parent"

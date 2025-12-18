@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.amigocake.admin.api.ApiConfig
+import com.amigocake.admin.databinding.ActivityHomeBinding
 import com.amigocake.admin.models.ApiResponse
 import com.amigocake.admin.models.DashboardStats
 import com.amigocake.admin.models.Order
@@ -20,20 +20,15 @@ import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var tvGreeting: TextView
-    private lateinit var tvTotalOrderCount: TextView
-    private lateinit var tvOrderListCount: TextView
-    private lateinit var tvRevenueTodayValue: TextView
-    private lateinit var tvRevenueMonthValue: TextView
-    private lateinit var tvDeadlineItemName: TextView
-    private lateinit var tvDeadlineDate: TextView
-    private lateinit var ivProfileSettings: android.widget.ImageView
-
+    private lateinit var binding: ActivityHomeBinding
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+
+        // Inisialisasi View Binding
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         sharedPreferences = getSharedPreferences("AmigoCakePrefs", Context.MODE_PRIVATE)
 
@@ -43,7 +38,6 @@ class HomeActivity : AppCompatActivity() {
             return
         }
 
-        initViews()
         setupGreeting()
         setupNavigation()
         loadDashboardStats()
@@ -55,20 +49,9 @@ class HomeActivity : AppCompatActivity() {
                 sharedPreferences.getString("userLevel", "") == "ADMIN"
     }
 
-    private fun initViews() {
-        tvGreeting = findViewById(R.id.tv_greeting)
-        tvTotalOrderCount = findViewById(R.id.tv_total_order_count)
-        tvOrderListCount = findViewById(R.id.tv_order_list_count)
-        tvRevenueTodayValue = findViewById(R.id.tv_revenue_today_value)
-        tvRevenueMonthValue = findViewById(R.id.tv_revenue_month_value)
-        tvDeadlineItemName = findViewById(R.id.tv_deadline_item_name)
-        tvDeadlineDate = findViewById(R.id.tv_deadline_date)
-        ivProfileSettings = findViewById(R.id.iv_profile_settings)
-    }
-
     private fun setupGreeting() {
         val userName = sharedPreferences.getString("userName", "Admin") ?: "Admin"
-        tvGreeting.text = "Hi, $userName"
+        binding.tvGreeting.text = "Hi, $userName"
     }
 
     private fun loadDashboardStats() {
@@ -115,16 +98,16 @@ class HomeActivity : AppCompatActivity() {
 
     private fun updateUI(stats: DashboardStats) {
         // 1. TOTAL ORDER (Semua waktu)
-        tvTotalOrderCount.text = stats.totalOrders.toString()
+        binding.tvTotalOrderCount.text = stats.totalOrders.toString()
 
         // 2. ORDER AKTIF (Process)
-        tvOrderListCount.text = stats.activeOrders.toString()
+        binding.tvOrderListCount.text = stats.activeOrders.toString()
 
         // 3. PENDAPATAN HARI INI
-        tvRevenueTodayValue.text = formatRupiah(stats.revenueToday)
+        binding.tvRevenueTodayValue.text = formatRupiah(stats.revenueToday)
 
         // 4. PENDAPATAN BULAN INI
-        tvRevenueMonthValue.text = formatRupiah(stats.revenueMonth)
+        binding.tvRevenueMonthValue.text = formatRupiah(stats.revenueMonth)
 
         // 5. DEADLINE PESANAN TERDEKAT
         updateDeadlineInfo(stats.nearestDeadline)
@@ -142,27 +125,27 @@ class HomeActivity : AppCompatActivity() {
                 "$itemName - $customerName"
             }
 
-            tvDeadlineItemName.text = displayText
-            tvDeadlineDate.text = formatDate(order.tanggal)
+            binding.tvDeadlineItemName.text = displayText
+            binding.tvDeadlineDate.text = formatDate(order.tanggal)
 
             // Tampilkan juga waktu jika ada
             if (!order.waktu.isNullOrEmpty()) {
-                tvDeadlineDate.text = "${formatDate(order.tanggal)} | ${order.waktu}"
+                binding.tvDeadlineDate.text = "${formatDate(order.tanggal)} | ${order.waktu}"
             }
         } else {
-            tvDeadlineItemName.text = "Tidak ada deadline"
-            tvDeadlineDate.text = "-"
+            binding.tvDeadlineItemName.text = "Tidak ada deadline"
+            binding.tvDeadlineDate.text = "-"
         }
     }
 
     private fun showDefaultData() {
         // Set default values jika gagal load data
-        tvTotalOrderCount.text = "0"
-        tvOrderListCount.text = "0"
-        tvRevenueTodayValue.text = formatRupiah(0)
-        tvRevenueMonthValue.text = formatRupiah(0)
-        tvDeadlineItemName.text = "Tidak ada data"
-        tvDeadlineDate.text = "-"
+        binding.tvTotalOrderCount.text = "0"
+        binding.tvOrderListCount.text = "0"
+        binding.tvRevenueTodayValue.text = formatRupiah(0)
+        binding.tvRevenueMonthValue.text = formatRupiah(0)
+        binding.tvDeadlineItemName.text = "Tidak ada data"
+        binding.tvDeadlineDate.text = "-"
     }
 
     private fun formatRupiah(amount: Int): String {
@@ -183,46 +166,46 @@ class HomeActivity : AppCompatActivity() {
 
     private fun setupNavigation() {
         // Manual Order Button
-        findViewById<android.widget.Button>(R.id.btn_manual_order).setOnClickListener {
+        binding.btnManualOrder.setOnClickListener {
             startActivity(Intent(this, OrderManualActivity::class.java))
         }
 
         // Order Review Header
-        findViewById<TextView>(R.id.tv_header_review).setOnClickListener {
+        binding.tvHeaderReview.setOnClickListener {
             startActivity(Intent(this, OrderRecapActivity::class.java))
         }
 
         // Order List Header
-        findViewById<TextView>(R.id.tv_order_list_header).setOnClickListener {
+        binding.tvOrderListHeader.setOnClickListener {
             startActivity(Intent(this, OrderListActivity::class.java))
         }
 
         // Profile Icon - NAVIGASI KE PROFILE
-        ivProfileSettings.setOnClickListener {
+        binding.ivProfileSettings.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
 
         // Bottom Navigation
-        findViewById<android.widget.LinearLayout>(R.id.nav_home_container).setOnClickListener {
+        binding.navHomeContainer.setOnClickListener {
             // Already on home - refresh data
             loadDashboardStats()
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_manual_order_container).setOnClickListener {
+        binding.navManualOrderContainer.setOnClickListener {
             startActivity(Intent(this, OrderManualActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_review_container).setOnClickListener {
+        binding.navReviewContainer.setOnClickListener {
             startActivity(Intent(this, OrderRecapActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_order_list_container).setOnClickListener {
+        binding.navOrderListContainer.setOnClickListener {
             startActivity(Intent(this, OrderListActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, ManagementOrderActivity::class.java))
+        binding.navTopicContainer.setOnClickListener {
+            startActivity(Intent(this, ProductManagementActivity::class.java)) // Ubah ke ProductManagementActivity
         }
     }
 

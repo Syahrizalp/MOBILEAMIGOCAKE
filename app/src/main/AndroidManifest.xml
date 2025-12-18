@@ -66,6 +66,14 @@
             android:name=".ProfileActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ProductManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AddEditProductActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>

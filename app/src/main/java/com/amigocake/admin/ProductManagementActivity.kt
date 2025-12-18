@@ -68,28 +68,25 @@ class ProductManagementActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
         // Bottom navigation
         binding.navHomeContainer.setOnClickListener {
-            // Sesuaikan dengan activity home Anda
-            // startActivity(Intent(this, DashboardActivity::class.java))
+            startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
 
         binding.navManualOrderContainer.setOnClickListener {
-            // Sesuaikan dengan activity manual order Anda
-            // startActivity(Intent(this, ManualOrderActivity::class.java))
+            startActivity(Intent(this, OrderManualActivity::class.java))
             finish()
         }
 
         binding.navReviewContainer.setOnClickListener {
-            // Sesuaikan dengan activity review Anda
-            // startActivity(Intent(this, OrderRecapActivity::class.java))
+            startActivity(Intent(this, OrderRecapActivity::class.java))
             finish()
         }
 
         binding.navOrderListContainer.setOnClickListener {
-            // Sesuaikan dengan activity order list Anda
-            // startActivity(Intent(this, OrderListActivity::class.java))
+            startActivity(Intent(this, OrderListActivity::class.java))
             finish()
         }
 
@@ -97,6 +94,11 @@ class ProductManagementActivity : AppCompatActivity() {
         binding.navTopicContainer.setOnClickListener {
             // Already here, do nothing
         }
+
+        binding.ivAdminIcon1.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+        
     }
 
     private fun loadProducts() {

@@ -12,6 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.amigocake.admin.api.ApiConfig
+import com.amigocake.admin.databinding.ActivityOrderManualBinding
+import com.amigocake.admin.databinding.ActivityOrderRecapBinding
 import com.amigocake.admin.models.OrderRecapResponse
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -33,6 +35,7 @@ class OrderRecapActivity : AppCompatActivity() {
     private lateinit var tvTotalRevenue: TextView
     private lateinit var btnMonthPicker: MaterialButton
     private lateinit var imgProfile: ImageView
+    private lateinit var binding: ActivityOrderRecapBinding
 
     private var selectedMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var selectedYear = Calendar.getInstance().get(Calendar.YEAR)
@@ -45,6 +48,9 @@ class OrderRecapActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_recap)
+
+        binding = ActivityOrderRecapBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         initView()
         setupLineChart()
@@ -323,25 +329,29 @@ class OrderRecapActivity : AppCompatActivity() {
 
     // ================= BOTTOM NAV =================
     private fun setupBottomNavigation() {
-        findViewById<LinearLayout>(R.id.nav_home_container).setOnClickListener {
+        binding.navHomeContainer.setOnClickListener {
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
 
-        findViewById<LinearLayout>(R.id.nav_manual_order_container).setOnClickListener {
+        binding.navManualOrderContainer.setOnClickListener {
             startActivity(Intent(this, OrderManualActivity::class.java))
         }
 
-        findViewById<LinearLayout>(R.id.nav_order_list_container).setOnClickListener {
+        binding.navOrderListContainer.setOnClickListener {
             startActivity(Intent(this, OrderListActivity::class.java))
         }
 
-        findViewById<LinearLayout>(R.id.nav_review_container).setOnClickListener {
+        binding.navReviewContainer.setOnClickListener {
             // Already on this screen
         }
 
-        findViewById<LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, TopicActivity::class.java))
+        binding.navTopicContainer.setOnClickListener {
+            startActivity(Intent(this, ProductManagementActivity::class.java))
+        }
+
+        binding.imageView7.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
     }
 

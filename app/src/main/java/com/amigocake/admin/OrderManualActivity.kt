@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.amigocake.admin.api.ApiConfig
+import com.amigocake.admin.databinding.ActivityOrderManualBinding
 import com.amigocake.admin.models.ApiResponse
 import com.amigocake.admin.models.OrderRequest
 import com.amigocake.admin.models.OrderResponse
@@ -34,6 +35,8 @@ class OrderManualActivity : AppCompatActivity() {
     private lateinit var inputPickupDate: EditText
     private lateinit var inputPrice: EditText
     private lateinit var buttonOrder: Button
+    private lateinit var binding: ActivityOrderManualBinding
+
 
     private var selectedDate = ""
     private var selectedTime = ""
@@ -41,6 +44,9 @@ class OrderManualActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_manual)
+
+        binding = ActivityOrderManualBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         initViews()
         setupPriceFormatter()
@@ -267,25 +273,30 @@ class OrderManualActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        findViewById<android.widget.LinearLayout>(R.id.nav_home_container).setOnClickListener {
+        binding.navHomeContainer.setOnClickListener {
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_manual_order_container).setOnClickListener {
+        binding.navManualOrderContainer.setOnClickListener {
             // Already on this screen
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_review_container).setOnClickListener {
+        binding.navReviewContainer.setOnClickListener {
             startActivity(Intent(this, OrderRecapActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_order_list_container).setOnClickListener {
+        binding.navOrderListContainer.setOnClickListener {
             startActivity(Intent(this, OrderListActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, TopicActivity::class.java))
+        binding.navTopicContainer.setOnClickListener {
+            startActivity(Intent(this, ProductManagementActivity::class.java))
+        }
+
+        binding.profileIcon.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
     }
+
 }

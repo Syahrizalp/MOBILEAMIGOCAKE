@@ -60,18 +60,19 @@
             app:layout_constraintTop_toBottomOf="@id/tv_greeting">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="232dp"
+                android:layout_height="93dp"
+                android:background="@drawable/kotakmanualorderlist"
                 android:orientation="vertical"
                 android:paddingHorizontal="24dp"
-                android:paddingVertical="10dp"
-                android:background="@drawable/kotakmanualorderlist">
+                android:paddingVertical="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pemesanan order manual"
-                    android:textColor="#6E6266" android:textSize="14sp" />
+                    android:textColor="#6E6266"
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/btn_manual_order"
@@ -84,7 +85,8 @@
                     android:drawablePadding="4dp"
                     android:padding="0dp"
                     android:text="Manual Order"
-                    android:textColor="#3A3135" android:textSize="20sp"
+                    android:textColor="#3A3135"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -110,8 +112,8 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_total_order_stats"
-                android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_width="144dp"
+                android:layout_height="99dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
@@ -124,26 +126,28 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_header_review">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="139dp"
                     android:layout_height="match_parent"
+                    android:background="@drawable/kotakmanualorderlist"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="8dp"
-                    android:background="@drawable/kotakmanualorderlist">
+                    android:padding="8dp">
 
                     <TextView
                         android:id="@+id/tv_total_order_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="200"
-                        android:textColor="#3A3135" android:textSize="32sp"
+                        android:textColor="#3A3135"
+                        android:textSize="32sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Total order"
-                        android:textColor="#6E6266" android:textSize="16sp" />
+                        android:textColor="#6E6266"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

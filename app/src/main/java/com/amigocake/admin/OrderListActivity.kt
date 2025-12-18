@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amigocake.admin.adapters.OrderAdapter
 import com.amigocake.admin.api.ApiConfig
+import com.amigocake.admin.databinding.ActivityOrderListBinding
 import com.amigocake.admin.models.ApiResponse
 import com.amigocake.admin.models.Order
 import com.google.android.material.button.MaterialButton
@@ -29,6 +30,7 @@ class OrderListActivity : AppCompatActivity() {
     private lateinit var filterStatusButton: MaterialButton
     private lateinit var filterSortButton: MaterialButton
     private lateinit var tvEmptyState: TextView
+    private lateinit var binding: ActivityOrderListBinding
 
     private var allOrders = mutableListOf<Order>() // Semua order
     private var displayedOrders = mutableListOf<Order>() // Order yang ditampilkan
@@ -38,6 +40,8 @@ class OrderListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_list)
+        binding = ActivityOrderListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         initViews()
         setupRecyclerView()
@@ -295,27 +299,33 @@ class OrderListActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        findViewById<android.widget.LinearLayout>(R.id.nav_home_container).setOnClickListener {
+        binding.navHomeContainer.setOnClickListener {
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_manual_order_container).setOnClickListener {
+        binding.navManualOrderContainer.setOnClickListener {
             startActivity(Intent(this, OrderManualActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_review_container).setOnClickListener {
+        binding.navReviewContainer.setOnClickListener {
             startActivity(Intent(this, OrderRecapActivity::class.java))
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_order_list_container).setOnClickListener {
+        binding.navOrderListContainer.setOnClickListener {
             // Already on this screen
         }
 
-        findViewById<android.widget.LinearLayout>(R.id.nav_topic_container).setOnClickListener {
-            startActivity(Intent(this, TopicActivity::class.java))
+        binding.navTopicContainer.setOnClickListener {
+            startActivity(Intent(this, ProductManagementActivity::class.java))
         }
+
+        binding.adminIcon.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
     }
+
 
     override fun onResume() {
         super.onResume()
